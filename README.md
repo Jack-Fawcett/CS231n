@@ -1,5 +1,5 @@
 # CS231n
-My work through to the assignments of [CS231n: Convolutional Neural Networks for Visual Recognition](cs231n.stanford.edu) course.
+My work through to the assignments of the 2017 iteration of [CS231n: Convolutional Neural Networks for Visual Recognition](http://cs231n.stanford.edu/2017/) course.
 
 I am grateful to Stanford for making the course resources available to the public. 
 
