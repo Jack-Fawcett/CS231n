@@ -24,12 +24,33 @@ def softmax_loss_naive(W, X, y, reg):
   dW = np.zeros_like(W)
 
   #############################################################################
-  # TODO: Compute the softmax loss and its gradient using explicit loops.     #
+  # Compute the softmax loss and its gradient using explicit loops.     #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+  
+  for i in range(num_train):
+      scores = X[i].dot(W)
+      # shift for numerical stability
+      scores -= np.max(scores)
+      scores_sumexp = np.sum(np.exp(scores))
+      scores_correctexp = np.exp(scores[y[i]])
+      loss -= np.log(scores_correctexp / scores_sumexp)
+      
+      dW[:, y[i]] -= ((scores_sumexp - scores_correctexp) / scores_sumexp) * X[i]
+      for j in range(num_classes):
+          if j == y[i]:
+              continue
+          dW[:, j] += (np.exp(scores[j]) / scores_sumexp) * X[i]
+      
+  loss /= num_train
+  loss += reg * np.sum(W*W)
+  dW /= num_train
+  dW += 2 * reg * W  
+  
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -48,12 +69,29 @@ def softmax_loss_vectorized(W, X, y, reg):
   dW = np.zeros_like(W)
 
   #############################################################################
-  # TODO: Compute the softmax loss and its gradient using no explicit loops.  #
+  # Compute the softmax loss and its gradient using no explicit loops.  #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+  
+  scores = X.dot(W)
+  scores -= np.max(scores, axis = 1, keepdims = True)
+  scores_sumexp = np.sum(np.exp(scores), axis = 1)
+  scores_correct = scores[np.arange(num_train), y]
+  loss = -np.sum(np.log(np.exp(scores_correct) / scores_sumexp))
+  
+  loss /= num_train
+  loss += reg * np.sum(W*W)
+  
+  s = np.divide(np.exp(scores), scores_sumexp.reshape(num_train, 1))
+  s[np.arange(num_train), y] -= 1
+  dW = X.T.dot(s)
+  
+  dW /= num_train
+  dW += 2 * reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
